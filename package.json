@@ -1,0 +1,27 @@
+{
+  "name": "ai_hello",
+  "version": "1.0.0",
+  "description": "A Python project demonstrating AI-powered hello world functionality.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "sandcastle": "npx tsx .sandcastle/main.mts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devilfish281/ai_hello.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Devilfish281/ai_hello/issues"
+  },
+  "homepage": "https://github.com/Devilfish281/ai_hello#readme",
+  "devDependencies": {
+    "@ai-hero/sandcastle": "^0.5.8"
+  }
+}

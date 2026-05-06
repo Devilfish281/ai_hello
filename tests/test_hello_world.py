@@ -1,6 +1,5 @@
-"""Tests for the hello_world module."""
+"""Tests for the hello_world module.
 
-"""
 Test 1:
 Interface called:
 i_hello_world_greet()
@@ -22,6 +21,7 @@ Mark
 Expected output:
 Hello Mark
 """
+
 from importlib import reload
 
 import ai_hello.hello_world.hello_world as hello_world_module
