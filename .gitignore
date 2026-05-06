@@ -49,6 +49,11 @@ docs/_build/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
+# Sandcastle logs and worktrees 
+node_modules/
+.sandcastle/.env
+.sandcastle/logs/
+
 # Environment directories
 .env
 .venv/
