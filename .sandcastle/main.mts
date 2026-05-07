@@ -9,12 +9,22 @@ await run({
   // A name for this run, shown as a prefix in log output.
   name: "worker",
 
-  // Sandbox provider — Docker is the default runtime.
-  sandbox: docker(),
+  // Docker sandbox.
+  // Put BOTH keys here so setup hooks and shell commands inside Docker can use them.
+  // Do not also put these keys in codex(..., { env }) or Sandcastle will throw
+  // an overlapping env keys error.
+  sandbox: docker({
+    env: {
+      OPENAI_KEY: process.env.OPENAI_KEY ?? process.env.OPENAI_API_KEY ?? "",
+      GH_TOKEN: process.env.GH_TOKEN ?? "",
+    },
+  }),
 
-  // The agent provider. Pass a model string to codex() — sonnet balances
-  // capability and speed for most tasks. Switch to claude-opus-4-6 for harder
-  // problems, or claude-haiku-4-5-20251001 for speed.
+  // The agent provider.
+  // Direct Codex may work on Windows because it can use your saved Codex login.
+  // Sandcastle runs Codex inside Docker, so we pass OPENAI_API_KEY into the agent.
+  // Codex agent.
+  // Do not pass OPENAI_API_KEY here because it is already in the Docker sandbox env.
   agent: codex("gpt-5.4-mini"),
 
   // Path to the prompt file. Shell expressions inside are evaluated inside the
@@ -36,15 +46,19 @@ await run({
   // starts. This avoids a full npm install from scratch on every iteration.
   // The onSandboxReady hook still runs npm install as a safety net to handle
   // platform-specific binaries and any packages added since the last copy.
-  copyToWorktree: ["node_modules"],
+  copyToWorktree: [],
 
   // Lifecycle hooks — commands grouped by where they run (host or sandbox).
   hooks: {
     sandbox: {
-      // onSandboxReady runs once after the sandbox is initialised and the repo is
-      // synced in, before the agent starts. Use it to install dependencies or run
-      // any other setup steps your project needs.
-      onSandboxReady: [{ command: "npm install" }],
+      onSandboxReady: [
+        { command: "npm install" },
+        { command: "/home/agent/.local/bin/poetry install --no-interaction" },
+        {
+          command:
+            'export OPENAI_API_KEY="$OPENAI_KEY" && printf "%s" "$OPENAI_API_KEY" | codex login --with-api-key',
+        },
+      ],
     },
   },
 });

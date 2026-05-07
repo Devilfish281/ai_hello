@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Devilfish281/ai_hello#readme",
   "devDependencies": {
-    "@ai-hero/sandcastle": "^0.5.8"
+    "@ai-hero/sandcastle": "^0.5.8",
+    "tsx": "^4.21.0"
   }
 }

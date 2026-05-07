@@ -6,7 +6,7 @@ authors = [
     {name = "Devilfish281",email = "Dobley@csu.fullerton.edu"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "python-dotenv (>=1.2.2,<2.0.0)"
 ]

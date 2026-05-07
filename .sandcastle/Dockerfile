@@ -1,33 +1,52 @@
-FROM node:22-bookworm
+FROM python:3.12-bookworm
 
-# Install system dependencies
+# Install system dependencies.
 RUN apt-get update && apt-get install -y \
   git \
   curl \
   jq \
+  ca-certificates \
+  gnupg \
+  pipx \
   && rm -rf /var/lib/apt/lists/*
 
-# Install GitHub CLI
+# Install Node.js 22 and npm.
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+  && apt-get update \
+  && apt-get install -y nodejs \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install GitHub CLI.
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
   | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
   | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-  && apt-get update && apt-get install -y gh \
+  && apt-get update \
+  && apt-get install -y gh \
   && rm -rf /var/lib/apt/lists/*
 
-# Rename the base image's "node" user (UID 1000) to "agent".
-# This keeps UID 1000 so that --userns=keep-id (Podman) and
-# --user 1000:1000 (Docker) map to the correct home directory owner.
-RUN usermod -d /home/agent -m -l agent node
+# Create the non-root agent user.
+RUN useradd -m -u 1000 -s /bin/bash agent
 
-# Install Codex CLI (run as root before USER agent)
+# Install Codex CLI globally.
 RUN npm install -g @openai/codex
 
+# Switch to the non-root agent user.
 USER agent
+
+# Add pipx-installed tools, such as Poetry, to PATH.
+ENV PIPX_HOME="/home/agent/.local/pipx"
+ENV PIPX_BIN_DIR="/home/agent/.local/bin"
+ENV PATH="/home/agent/.local/bin:${PATH}"
+
+# Install Poetry.
+RUN pipx install poetry
+
+# Prove Python and Poetry are available during image build.
+RUN python --version
+RUN poetry --version
 
 WORKDIR /home/agent
 
-# In worktree sandbox mode, Sandcastle bind-mounts the git worktree at /home/agent/workspace
-# and overrides the working directory to /home/agent/workspace at container start.
-# Structure your Dockerfile so that /home/agent/workspace can serve as the project root.
+# Sandcastle bind-mounts the git worktree at /home/agent/workspace.
 ENTRYPOINT ["sleep", "infinity"]
