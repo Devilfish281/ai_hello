@@ -67,3 +67,5 @@ ENV/
 # Windows and Mac OS system files
 Thumbs.db
 .DS_Store
+
+chat_gpt/
