@@ -60,6 +60,8 @@ node_modules/
 env/
 venv/
 ENV/
+# Working Branch
+.ai_coder
 
 # VS Code settings
 .vscode/
